@@ -1,5 +1,5 @@
 import warnings
-from pydantic import PydanticDeprecatedSince20
+from pydantic import ConfigDict
 
 warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
 
@@ -171,3 +171,18 @@ if __name__ == "__main__":
                     )
 
                 # Ваши остальные роуты...
+                from fastapi import FastAPI
+                import warnings
+                from pydantic import BaseModel
+
+                # Отключаем предупреждения Pydantic 1.x
+                warnings.filterwarnings("ignore", category=UserWarning)
+
+                app = FastAPI()
+
+
+                @app.get("/")
+                async def root():
+                    return {"message": "API работает!"}
+
+                # Ваши остальные роуты и модели...
