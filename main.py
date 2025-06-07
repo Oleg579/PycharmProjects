@@ -78,3 +78,67 @@ if __name__ == "__main__":
         port=8000,
         reload=True
     )
+
+    from fastapi import Request
+    from fastapi.responses import JSONResponse
+
+
+    @app.exception_handler(404)
+    async def not_found_exception_handler(request: Request, exc):
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Endpoint not found"},
+        )
+
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    import warnings
+    from sqlalchemy.exc import SAWarning
+    from fastapi import FastAPI, status
+    from fastapi.responses import JSONResponse
+
+    # Настройка логирования
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    # Отключаем warnings SQLAlchemy
+    warnings.filterwarnings("ignore", category=SAWarning)
+
+    app = FastAPI(title="My FastAPI Service")
+
+
+    @app.on_event("startup")
+    async def startup():
+        logger.info("Service starting...")
+
+
+    @app.get("/", status_code=status.HTTP_200_OK)
+    async def health_check():
+        return JSONResponse(
+            content={
+                "status": "running",
+                "endpoints": {
+                    "docs": "/docs",
+                    "redoc": "/redoc"
+                }
+            }
+        )
+
+
+    if __name__ == "__main__":
+        import uvicorn
+
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=8000,
+            log_level="info"
+        )
