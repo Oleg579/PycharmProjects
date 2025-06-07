@@ -11,9 +11,28 @@ from sqlalchemy.orm import Session
 from app.database import engine, get_db
 from app import models, schemas
 
+import warnings
+from sqlalchemy.exc import SAWarning
+
+# Отключаем конкретные предупреждения SQLAlchemy
+warnings.filterwarnings('ignore', category=SAWarning)
+
 # Создаем таблицы
 models.Base.metadata.create_all(bind=engine)
 
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to FastAPI",
+        "endpoints": {
+            "docs": "/docs",
+            "redoc": "/redoc"
+        }
+    }
 app = FastAPI()
 
 # Настройка CORS
