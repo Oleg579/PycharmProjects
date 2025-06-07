@@ -1,3 +1,7 @@
+import warnings
+from pydantic import PydanticDeprecatedSince20
+
+warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
 
 import sys
 from pathlib import Path
@@ -152,3 +156,18 @@ if __name__ == "__main__":
                 import uvicorn
 
                 uvicorn.run(app, host="0.0.0.0", port=8000)
+
+                from fastapi import FastAPI
+                from fastapi.responses import JSONResponse
+
+                app = FastAPI()
+
+
+                @app.get("/")
+                async def root():
+                    return JSONResponse(
+                        content={"status": "OK", "message": "Welcome to FastAPI"},
+                        status_code=200
+                    )
+
+                # Ваши остальные роуты...
